@@ -7,9 +7,7 @@ import del from 'del'
 
 const srcDir = 'src', destDir = 'dist'
 
-const babelConfig = () => babel({
-  presets: ['@babel/env']
-})
+const babelConfig = async () => babel(await import('./babel.config.js'))
 
 /* 
 Watch for changes to the destDir using nodemon
@@ -28,7 +26,7 @@ Use babel to compile files
 const build = (srcPath, destPath, babelConfig) => 
   src([srcPath])
   .pipe(sourcemaps.init())
-  .pipe(babelConfig())
+  .pipe(babelConfig)
   .pipe(sourcemaps.mapSources(sourcePath =>  path.join(__dirname, srcDir, sourcePath)))
   .pipe(sourcemaps.write())
   .pipe(dest(destPath))
@@ -36,7 +34,18 @@ const build = (srcPath, destPath, babelConfig) =>
 /*
 Use babel to compile everything from the srcDir into the destDir
 */
-export const buildAll = () => build(path.join(srcDir,'**/*.js'), destDir, babelConfig)
+export const buildAll = async () =>  {
+  let config = await babelConfig()
+  console.log(config)
+  // config = babel({
+  //   presets: ['@babel/env']
+  // })
+  const thing = await import('./babel.config.js')
+  console.log(thing)
+  config = babel({presets: thing.presets})
+  build(path.join(srcDir,'**/*.js'), destDir, config)
+  return true
+}
 
 // Convert a filepath from src into a filepath to dest
 const destPath = srcPath => srcPath.replace(srcDir, destDir)
