@@ -7,7 +7,7 @@ import del from 'del'
 
 const srcDir = 'src', destDir = 'dist'
 
-const babelConfig = async () => babel(await import('./babel.config.js'))
+const babelConfig = async () => babel((await import('./babel.config.js')).default)
 
 /* 
 Watch for changes to the destDir using nodemon
@@ -35,14 +35,7 @@ const build = (srcPath, destPath, babelConfig) =>
 Use babel to compile everything from the srcDir into the destDir
 */
 export const buildAll = async () =>  {
-  let config = await babelConfig()
-  console.log(config)
-  // config = babel({
-  //   presets: ['@babel/env']
-  // })
-  const thing = await import('./babel.config.js')
-  console.log(thing)
-  config = babel({presets: thing.presets})
+  const config = await babelConfig()
   build(path.join(srcDir,'**/*.js'), destDir, config)
   return true
 }
@@ -55,9 +48,10 @@ Use gulp to watch the files in the srcDir and compile them using babel when they
 */
 export const buildWatch = async () => {
   const watcher = watch([path.join(srcDir,'**/*')]);
+  const config = await babelConfig()
 
   const compile = filePath => 
-  build(filePath, path.parse(destPath(filePath)).dir, babelConfig)
+  build(filePath, path.parse(destPath(filePath)).dir, config)
   .on('end', () => console.log("compiled", filePath))
   
   const remove = filePath => 

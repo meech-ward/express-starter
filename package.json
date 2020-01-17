@@ -3,8 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "gulp build && node bin/www",
-    "test": "mocha ./test/* --require @babel/register"
+    "start": "npx gulp",
+    "build": "npx gulp buildAll",
+    "test": "npx jest"
   },
   "dependencies": {
     "debug": "~2.6.9",
@@ -17,14 +18,16 @@
     "@babel/node": "^7.7.7",
     "@babel/preset-env": "^7.7.7",
     "@babel/register": "^7.7.7",
+    "babel-jest": "^24.9.0",
     "del": "^5.1.0",
     "esm": "^3.2.25",
     "gulp": "^4.0.2",
     "gulp-babel": "^8.0.0",
     "gulp-nodemon": "^2.4.2",
     "gulp-sourcemaps": "^2.6.5",
-    "mocha": "^6.2.2",
+    "jest": "^24.9.0",
     "nodemon": "^2.0.2",
-    "source-map-support": "^0.5.16"
+    "source-map-support": "^0.5.16",
+    "supertest": "^4.0.2"
   }
 }
