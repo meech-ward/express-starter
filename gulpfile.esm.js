@@ -7,7 +7,7 @@ import del from 'del'
 
 const srcDir = 'src', destDir = 'dist'
 
-const babelConfig = async () => babel((await import('./babel.config.js')).default)
+const babelConfig = {presets: ['@babel/preset-env']}
 
 /* 
 Watch for changes to the destDir using nodemon
@@ -26,7 +26,7 @@ Use babel to compile files
 const build = (srcPath, destPath, babelConfig) => 
   src([srcPath])
   .pipe(sourcemaps.init())
-  .pipe(babelConfig)
+  .pipe(babel(babelConfig))
   .pipe(sourcemaps.mapSources(sourcePath =>  path.join(__dirname, srcDir, sourcePath)))
   .pipe(sourcemaps.write())
   .pipe(dest(destPath))
@@ -35,8 +35,7 @@ const build = (srcPath, destPath, babelConfig) =>
 Use babel to compile everything from the srcDir into the destDir
 */
 export const buildAll = async () =>  {
-  const config = await babelConfig()
-  build(path.join(srcDir,'**/*.js'), destDir, config)
+  build(path.join(srcDir,'**/*.js'), destDir, babelConfig)
   return true
 }
 
@@ -47,12 +46,13 @@ const destPath = srcPath => srcPath.replace(srcDir, destDir)
 Use gulp to watch the files in the srcDir and compile them using babel when they change
 */
 export const buildWatch = async () => {
-  const watcher = watch([path.join(srcDir,'**/*')]);
-  const config = await babelConfig()
+  const watcher = watch([path.join(srcDir, '**/*')]);
 
-  const compile = filePath => 
-  build(filePath, path.parse(destPath(filePath)).dir, config)
+  const compile = filePath =>  {
+  build(filePath, path.parse(destPath(filePath)).dir, babelConfig)
   .on('end', () => console.log("compiled", filePath))
+  return null}
+  
   
   const remove = filePath => 
   del([destPath(filePath)])
